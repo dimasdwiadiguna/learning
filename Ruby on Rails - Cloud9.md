@@ -11,43 +11,36 @@ Di pane environment, klik gear lalu ceklis Show root folder dan unceklis Show en
 ## Langkah Persiapan
 
 1. Cloud9 menggunakan RVM (Ruby Version Manager) untuk mengatur versi ruby yang akan digunakan. Untuk melihat versi ruby yang digunakan saat ini dan mana yang menjadi default, ketikkan perintah `rvm list`
+
 2. Jika versi ruby yang ingin digunakan berbeda, gunakan perintah berikut `rvm install ruby-2.3.4` (misal untuk menginstall versi tersebut)
+
    :warning: Umumnya untuk menginstall versi ruby menggunakan rvm tidak bisa dilakukan tanpa privilege superuser, sehingga lakukanlah dalam lingkungan superuser dengan terlebih dahulu mengetikkan `superuser su` hingga tanda $ berubah menjadi tanda #
+
 3. Masih dalam privilege superuser, setelah versi ruby yang diinginkan selesai diinstall, set pula versi tersebut sebagai versi default yang digunakan menggunakan perintah `rvm --default use 2.3.4` sehingga setiap kali kita akan memulai IDE ini, versi 2.3.4 lah yang digunakan
+
 4. Keluarlah dari privilege superuser menggunakan perintah `exit`
+
 5. Periksalah apakah rails sudah terinstall dengan mengetikkan `rails -v`. Jika belum, lakukan instalasi dengan `gem install rails -v 2.4.5 --no-ri --no-docs `.
+
 6. Lalu lakukan gem install bundler --no-ri --no-docs
+
 7. Lalu install gem install rake
+
 8. Lalu buatlah aplikasi baru menggunakan `rails _2.4.5_ new toy_app`
+
 9. Jalankan server dengan mengetikkan `rails s -b $IP -p $PORT`
 
 
 
-```matlab
-function [a,k] = metodeNewton(J0,F0,x0,tol,iterMaks)
-    format shortEng;
-    disp('%%% Script Metode Newton oleh Dimas Dwi Adiguna (20916005) %%%');
-    %disp('%% Kalkulasi untuk tebakan awal : ');disp(transpose(x0));
-    a = transpose(x0);
-    for k = 1:iterMaks
-        %disp(['%%%% Iter:',num2str(k)])
-        syms x1 x2;
-        J = double(subs(J0,[x1,x2],a));
-        F = double(subs(F0,[x1,x2],a));
-        F = double(F.*(-1));
-        y = linsolve(J,F);
-        if isinf(y)
-            disp('Sistem linear tidak tersolusikan')
-            break
-        end
-        a = a + transpose(y);
-        if norm(y) <= tol
-            disp(['Converges in step number:',num2str(k)]);disp(double(a));
-            break
-        end
-    end
-end
-```
+Notes:
+
+1. Mau bikin button yang kayak gini wkwk
+
+   https://dribbble.com/shots/3987277-Perspective-Button-Click
+
+2. Untuk integrasi RoR dengan kekuatan python di ML
+
+   https://www.netguru.co/blog/ruby-on-rails-in-machine-learning-yay-or-nay
 
 
 
@@ -139,6 +132,7 @@ Secara otomatis rails akan mendeteksi keyword create sebagai migration untuk mem
 t.string   "title"
 t.text     "description"
 t.datetime "created_at"
+# atau kadang langsung t.timestamps
 ```
 
 Lalu save dan eksekusi perintah migrasi dengan `rake db:migrate`
@@ -166,5 +160,25 @@ Article.all
 => #<ActiveRecord::Relation []> 
 Article
 => Article(id: integer, title: string, description: text, created_at: datetime, updated_at: datetime)
+
+#Cara update 1
+article = Article.new
+article.title = "First post"
+article.description = "This is my first post. Created in rails console"
+article
+=> ... #nanti ditunjukkan konten dari article baru tersebut
+article.save
+
+#Cara update 2
+article = Article.new(tile: "Second!!", description: "This is my second post")
+article.save
+
+#Cara update 3
+Article.create(title: "Third. Yeah", description: "Because this third post is created using create method, it automatically saves")
+
+Article.all
+=> ... #muncul article baru barusan 
+
+exit
 ```
 
