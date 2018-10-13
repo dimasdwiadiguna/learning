@@ -123,3 +123,48 @@ Semestinya semua bisa dipush dengan baik
 heroku run rake db:migrate
 ```
 
+
+
+## Database!
+
+Dalam rails, model adalah tempat penyimpanan data-data yang terdiri atas tabel-tabel. Model memiliki nomenklatur camel case dan singular (Article). Sementara database memiliki nomenklatur lower case plural (articles). Nama file model tersebut lower case singular (article.rb) dan nama controllernya lower case plural (articles_controller.rb)
+
+```bash
+rails generate migration create_articles
+```
+
+Secara otomatis rails akan mendeteksi keyword create sebagai migration untuk membuat sebuah database. Sehingga ketika kita membuka folder db > migrate akan muncul file migration dengan template def create articles do. Isilah dengan perintah berikut untuk menginisiasi kolom:
+
+```ruby
+t.string   "title"
+t.text     "description"
+t.datetime "created_at"
+```
+
+Lalu save dan eksekusi perintah migrasi dengan `rake db:migrate`
+
+Kalau ingin membuat perubahan, generate migration lagi dengan nama yang deskriptif, lalu di dalam def change do, masukkan:
+
+```ruby
+add_column :articles, :updated_at, :datetime
+```
+
+Buatlah sebuah file di app > model dengan nama `article.rb`
+
+```ruby
+class Article < ActiveRecord::Base
+   # Kalo rails 5, class ini diturunkan dari ApplicationRecord 
+end
+```
+
+Karena namanya yang terikat secara nomenklatur dengan tabel articles, secara otomatis rails akan membangun hubungan diantaranya dan membuat getter setter untuk mereka. Untuk mengeceknya:
+
+```bash
+rails console
+
+Article.all
+=> #<ActiveRecord::Relation []> 
+Article
+=> Article(id: integer, title: string, description: text, created_at: datetime, updated_at: datetime)
+```
+
