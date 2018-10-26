@@ -304,36 +304,7 @@ Semisal kita ingin di /articles/new
 
    Tapi biasanya keperluan ini hanya untuk debugging saja dan menunjukkan bahwa form yang disubmit ke app berbentuk hash (key-value pairs, di python disebut sebagai dict)
 
-5. Untuk mensubmit article baru ke database, gunakan Article.new(article_params) yang isi dari article_params tersebut didefinisikan dalam sebuah fungsi private yang melakukan whitelisting variabel title dan description.
-
-   **Mengapa kita perlu memanggil method require dan permit?** Dalam rails dikenal istilah whitelist, yaitu menunjukkan kepada Rails mengenai variabel apa saja yang diperbolehkan untuk disubmit ke model, karena tidak semua yang di-pass ke dalam app perlu untuk di-pass juga untuk memodifikasi model.
-
-   Berikut adalah sebuah contoh:
-
-   ` params.require(:post).permit(:title,:body)`
-
-   > Here you first tell Rails which attributes are allowed for new post objects – title and body in this example – and then you create the new post. This is simple enough and quite readable. You are telling Rails: “data for a post is required and it’s attributes may only include title and body attributes.”
-
-   ```ruby
-   # Hash for creating new post
-   post_attributes = {
-       title: "post",
-       body: "post body"
-       }
-   
-   # Array as an argument passed in permit method
-   params.permit(
-       :title,:body)
-   ```
-
-   > Notice the arguments are actually a single array (internally Rails processes the arguments as an array). Each key/value pair on the left maps to an array element on the right. You permit a hash by passing an array.
-
-   Bagaimana kalau yang kita submit bukan hanya sesimpel 1 layer (title:"...", body:"...") tapi nested yang didalamnya berisi array (title:"...", body:"...",comments:[{text:"..."},{text:"..."}])
-
-   Pat Shaughnessy memberikan penjelasan mengenai kebingungan mengenai whitelisting untuk nested attributes dan strong parameter disini :
-
-   http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters
-
+5. Untuk mensubmit article baru ke database, gunakan `Article.new(article_params)` yang isi dari article_params tersebut didefinisikan dalam sebuah fungsi private yang melakukan whitelisting variabel title dan description.
 
    ```ruby
    def create
@@ -347,6 +318,34 @@ Semisal kita ingin di /articles/new
      params.require(:article).permit(:title,:description)
    end
    ```
+   **Mengapa kita perlu memanggil method require dan permit?** Dalam rails dikenal istilah whitelist, yaitu menunjukkan kepada Rails mengenai variabel apa saja yang diperbolehkan untuk disubmit ke model, karena tidak semua yang di-pass ke dalam app perlu untuk di-pass juga untuk memodifikasi model.
+
+   Berikut adalah sebuah contoh:
+
+   ` params.require(:post).permit(:title,:body)`
+
+> Here you first tell Rails which attributes are allowed for new post objects – title and body in this example – and then you create the new post. This is simple enough and quite readable. You are telling Rails: “data for a post is required and it’s attributes may only include title and body attributes.”
+
+```ruby
+# Hash for creating new post
+post_attributes = {
+    title: "post",
+    body: "post body"
+}
+
+# Array as an argument passed in permit method
+params.permit(
+    :title,:body)
+```
+
+> Notice the arguments are actually a single array (internally Rails processes the arguments as an array). Each key/value pair on the left maps to an array element on the right. You permit a hash by passing an array.
+
+Bagaimana kalau yang kita submit bukan hanya sesimpel 1 layer (title:"...", body:"...") tapi nested yang didalamnya berisi array (title:"...", body:"...",comments:[{text:"..."},{text:"..."}])
+
+Pat Shaughnessy memberikan penjelasan mengenai kebingungan mengenai whitelisting untuk nested attributes dan strong parameter disini :
+
+http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters
+
 
 6. **Memvalidasi post yang dimasukkan**
    Buatlah sebuah if scenario di def create:
@@ -363,24 +362,27 @@ Semisal kita ingin di /articles/new
    ```
 
 7. **Menunjukkan respon bahwa input berhasil**
-   `flash[:notice] = "Success"`
 
-   Di file application.html.erb (master level template), di atas field yield, buatlah sebuah wadah bernama flash tersebut
+      `flash[:notice] = "Success"`
 
-   ```html
-   <body>
-       <% flash.each do |name,msg| %>
-           <ul>
-               <li><%= msg %</li>
-           </ul>
-       <% end %>
-   <%= yield %>
-   </body>
-   ```
+      > Flash (atau FlashHash) adalah objek Ruby on Rails yang cocok untuk menyimpan error atau notifikasi bagi pengguna karena sifatnya hanya menyimpan secara temporer sampai berhasil di render di template, setelah itu kontennya akan dihapus. (Flash hanya menyimpan objek primitif saja, sehingga kalau butuh link, butuh di-sanitize)
 
-   Perhatikan bagian mana dari embedded ruby tersebut yang dirender dan bagian mana yang tidak dirender
+      Di file application.html.erb (master level template), di atas field yield, buatlah sebuah wadah bernama flash tersebut
 
+      ```html
+      <body>
+      	<% flash.each do |name,msg| %>
+      		<ul>
+      			<li><%= msg %</li>
+      		</ul>
+          <% end %>
+      	<%= yield %>
+      </body>
+      ```
+
+      Perhatikan bagian mana dari embedded ruby tersebut yang dirender dan bagian mana yang tidak dirender
 8. **Menunjukkan respon bahwa input gagal**
+
    Karena direncanakan bahwa kegagalan input akan mengembalikan user ke tampilan form (tidak di-redirect kemanapun), maka kita bisa memasukkan wadah untuk menunjukkan error tersebut di halaman new.html.erb saja:
 
    ```html
@@ -396,6 +398,10 @@ Semisal kita ingin di /articles/new
    ...
    ```
 
+   Bagaimana bila kita ingin menjadikan bagian ini menjadi partial dan bisa dipakai untuk models apapun (tidak hanya @article), maka bagaimana mengganti bagian @article tersebut?
+
+   ...
+
 9. Menunjukkan hasil input sebagai follow-up keberhasilan submit
    Di folder view > articles > show.html.erb
 
@@ -410,6 +416,7 @@ Semisal kita ingin di /articles/new
    ```
 
 10. **Mengedit article**
+
     Dengan mengecek rake routes, ditemukan bahwa path untuk mengedit article adalah /articles/:id/edit. Maka buatlah controllernya di articles_controller
 
     ```ruby
@@ -435,6 +442,7 @@ Semisal kita ingin di /articles/new
     ```
 
 11. **Index action**
+
     Karena route index sudah dibuat dari resources (prefixnya "articles"), maka kita tinggal menyiapkan actionnya (yaitu "index")
 
     ```ruby
@@ -665,3 +673,16 @@ Untuk melihat bagaimana form yang dibuat menggunakan form_for dapat di-style men
   </div>
 </div>
 ```
+
+
+
+
+
+#### Memahami Bootstrap 12-col grid system
+
+- `col` itu menunjukkan column
+- `xs/sm/md/lg` itu menunjukkan breakpoint. Breakpoint itu menunjukkan bagaimana ukuran sebuah komponen pada masing-masing ukuran
+- `<angka>` yang menunjukkan berapa column yg diambil. Kalau tidak diisi, maka akan beleber sampe penuh 100%
+- Satu baris maksimal berisi 12 kolom. Jika sebaris komponen ternyata jumlahnya lebih dari 12 kolom, maka akan overflow ke baris selanjutnya (sifatnya float)
+- Begitu pula kalo kurang, maka kolom sisanya akan kosong (tidak jadi melebar)
+
